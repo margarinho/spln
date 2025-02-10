@@ -18,7 +18,7 @@ def reading_from_file(filename, keyword=None):
     print("".join(str(x) for x in uniqlines))
 
 if __name__ == "__main__":
-    keyword = sys.argv[2] if len(sys.argv) > 2 else None  # Palavra-chave opcional
+    keyword = sys.argv[2] if len(sys.argv) > 2 else None 
     if len(sys.argv) == 1:
         reading_from_stdin(keyword)
     else:
