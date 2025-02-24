@@ -37,7 +37,7 @@ def main():
         sys.exit(1)
 
     flags = {
-        "d": None,
+        "d": [],
         "s": False,
         "e": False,
         "h": False,
@@ -58,10 +58,14 @@ def main():
     if file:
          with open(file, "r") as f:
             flags["d"] += f.readlines()
-    else:
-        flags['d'] = sys.stdin.read()
+    
+    try:
+        for line in sys.stdin:
+            flags["d"].append(line)
+            rm_lines(flags)  # Processa cada nova entrada
 
-    rm_lines(flags)
+    except KeyboardInterrupt:
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
