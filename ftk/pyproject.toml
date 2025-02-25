@@ -6,5 +6,5 @@ dependencies = ["jjcli"]
 description = """ """
 license = {text = "MIT"}
 
-[project.scrips]
+[project.scripts]
 ftl-occ= "ftk.base:main"
