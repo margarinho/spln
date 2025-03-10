@@ -2,9 +2,10 @@
 name = "ftk"
 version = "0.1.0"
 authors = [{name="Ana", email="magui.lopes03@gmail.com"}]
-dependencies = ["jjcli"]
+dependencies = ["jjcli","docopt"]
 description = """ """
 license = {text = "MIT"}
 
 [project.scripts]
 ftl-occ = "ftk.base:main"
+ftl-freq = "ftk.freq_calc:main"

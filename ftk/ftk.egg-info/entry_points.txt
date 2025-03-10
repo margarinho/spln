@@ -1,0 +1,3 @@
+[console_scripts]
+ftl-freq = ftk.freq_calc:main
+ftl-occ = ftk.base:main

@@ -1,48 +1,68 @@
 import re
-import jjcli
+from docopt import docopt
 from collections import Counter
 def lexer(text):
     #FIX ME patterns stopwprds lems
-    return re.findall(r'\w+(?:-\w+)* | [^\w\s]+',text)
+    return re.findall(r'\w+(?:-\w+)*|[^\w\s]+',text)
 
-def pretty_print(a, r, opt):
-    
+def pretty_print(a, r, label_a, name):
+    outp = []
     total = sum(a.values())
 
-    if "-a" in opt:
-        for word, value in a.mostcommon():
-            print(f"{word}  {value}")
+    if label_a:
+        for word, value in a.most_common():
+           outp.append(f"{value}    {word}")
     else:
-        print("Total    " + total)
+        print("Total    " + str(total))
         for word, value in r:
-            print(f"{word}  {value:.2f}")
+           outp.append(f"{value:.2f}    {word}")
+
+    if name:
+        print("hello")
+        with open(f"{name}.txt","w") as f:
+            f.write("\n".join(outp))
+    else:
+        print("\n".join(outp))
         
-def counter(tokens):
+def counter(tokens, num):
     counter = Counter(tokens)
     total_count = sum(counter.values())
-    relative = [(word, count / total_count * 1000000) for word, count in counter.mostcommon()]
+    type(num)
+    relative = [(word, (int(count) / total_count) * num) if isinstance(count, (int, float)) else (word, 0) for word, count in counter.most_common()]
+
     return counter, relative
     
 
 def main():
-    #Completar o menu de opções
-    """Options:
-        -a: absolute frequency 
-        -m 700: top 700 words (FIX ME)
-        -j: json (FIX ME)
+    doc = """Usage:
+    ftl-occ <file> -a 
+    ftl-occ <file> -m <int>
+    ftl-occ <file> -j <saida_json>
+    ftl-occ <file> -a -m <int>
+    ftl-occ <file> -a -j <saida_json>
+    ftl-occ <file> -m <int> -j <saida_json>
+    ftl-occ <file> -a -m <int> -j <saida_json>
     """
+    args = docopt(doc) 
     
-    cli = jjcli.clfilter("am:", doc=main._doc_)
     tokens = []
     
-    for txt in cli.text():
+    if args.get("<file>"):
+        with open('ficheiro.txt', 'r') as file:
+            content = file.readlines()
+    
+    for txt in content:
         l = lexer(txt)
-        print(l)
-        tokens.append(l)
-        
-    absolute, relative = counter(tokens)
+        tokens.extend(l)
+    
+    num = args.get("<int>") if args.get("-m") else 1000000
+    
+    print(num)
+    
+    absolute, relative = counter(tokens, float(num))    
+    
+    pretty_print(absolute,relative, args.get("-a"), args.get("<saida_json>"))
 
-    pretty_print(absolute,relative, cli.opt)
 
 
         
