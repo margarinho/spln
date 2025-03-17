@@ -1,68 +1,81 @@
-import re
+# Base.py
+# Last update 12 de março de 2025
+
 from docopt import docopt
-from collections import Counter
-def lexer(text):
-    #FIX ME patterns stopwprds lems
-    return re.findall(r'\w+(?:-\w+)*|[^\w\s]+',text)
-
-def pretty_print(a, r, label_a, name):
-    outp = []
-    total = sum(a.values())
-
-    if label_a:
-        for word, value in a.most_common():
-           outp.append(f"{value}    {word}")
-    else:
-        print("Total    " + str(total))
-        for word, value in r:
-           outp.append(f"{value:.2f}    {word}")
-
-    if name:
-        print("hello")
-        with open(f"{name}.txt","w") as f:
-            f.write("\n".join(outp))
-    else:
-        print("\n".join(outp))
-        
-def counter(tokens, num):
-    counter = Counter(tokens)
-    total_count = sum(counter.values())
-    type(num)
-    relative = [(word, (int(count) / total_count) * num) if isinstance(count, (int, float)) else (word, 0) for word, count in counter.most_common()]
-
-    return counter, relative
-    
+from ftk.utils import pretty_print, lexer, read_txt, read_pkl, read_txt, counter_transformation
+from ftk.calcus import counter, normalization
 
 def main():
     doc = """Usage:
-    ftl-occ <file> -a 
-    ftl-occ <file> -m <int>
-    ftl-occ <file> -j <saida_json>
-    ftl-occ <file> -a -m <int>
-    ftl-occ <file> -a -j <saida_json>
-    ftl-occ <file> -m <int> -j <saida_json>
-    ftl-occ <file> -a -m <int> -j <saida_json>
+    ftl-occ <f_input> -a 
+    ftl-occ <f_input> -m <int>
+    ftl-occ <f_input> -a -j <f_output>
+    ftl-occ <f_input> -m <int> -j <f_output>
     """
     args = docopt(doc) 
     
     tokens = []
     
-    if args.get("<file>"):
-        with open('ficheiro.txt', 'r') as file:
-            content = file.readlines()
+    f_input = args.get("<f_input>")
     
-    for txt in content:
-        l = lexer(txt)
+    upload_data = read_txt(f_input)
+    regex = r'\w+(?:-\w+)*|[^\w\s]+'
+    
+    for txt in upload_data:
+        l = [item.lower() for item in lexer(regex, txt)]
         tokens.extend(l)
     
     num = args.get("<int>") if args.get("-m") else 1000000
     
-    print(num)
+    absolute, relative = counter(tokens, float(num))   
     
-    absolute, relative = counter(tokens, float(num))    
+    total = sum(absolute.values())
     
-    pretty_print(absolute,relative, args.get("-a"), args.get("<saida_json>"))
+    # maybe make it better
+    data = absolute if args.get("-a") else relative
+    
+    print("Print do counter para imprimir: ", data)
+    
+    pretty_print((total, data), args.get("<f_output>"))
 
+
+def suprise_main():
+    doc = """Usage:
+    ftl-sup -s <file_long> <num>
+    ftl-sup -pt <file_ref> <file_cor>
+    """
+    args = docopt(doc) 
+    
+    to_print = None
+        
+    if args.get("-s") and args.get("<file_long>") and args.get("<num>"):
+        num = args.get("<num>")
+        upload_data = read_txt(args.get("<file_long>"))
+        counter = counter_transformation(upload_data)
+        
+        to_print = (counter, float(num), "ref_.pkl")
+    
+    elif args.get("-pt") and args.get("<file_ref>") and args.get("<file_cor>"):
+        counter_ref = read_pkl(args.get("<file_ref>"))
+        counter_cor = read_pkl(args.get("<file_cor>"))
+        output = normalization(counter_ref, counter_cor)
+        
+        to_print = (output, 3, None)
+        
+    else:
+        print("Try again")
+        return
+    
+    total_output = sum(to_print[0].values())
+    
+    filter_output = {key: to_print[0].get(key) for key in to_print[0].keys() if to_print[0].get(key) > to_print[1]}
+    
+    
+        
+    pretty_print((total_output, dict(sorted(filter_output.items(), key=lambda item: item[1]))), to_print[2])
+    
+    
+    
 
 
         

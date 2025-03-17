@@ -8,4 +8,4 @@ license = {text = "MIT"}
 
 [project.scripts]
 ftl-occ = "ftk.base:main"
-ftl-freq = "ftk.freq_calc:main"
+ftl-sup = "ftk.base:suprise_main"
